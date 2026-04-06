@@ -1,0 +1,29 @@
+name: Daily OFO Check-in
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 09:00 Asia/Shanghai = 01:00 UTC
+    - cron: "0 1 * * *"
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run check-in
+        env:
+          OFO_AUTH_DATA: ${{ secrets.OFO_AUTH_DATA }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: python checkin.py
